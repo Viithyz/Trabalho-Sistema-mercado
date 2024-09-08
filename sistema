@@ -1,0 +1,86 @@
+#include <iostream>
+#include <locale.h> //biblioteca para caracteres em portugues
+#include <stdlib.h> //usar o clear
+#include <unistd.h> //usar o sleep
+using namespace std;
+
+struct Mercado
+{
+    string nomeDoProduto;
+    float quantidade;
+    float valorDeVenda;
+};
+
+int main()
+{   Mercado usuario;
+    int selecaoDeModulo,metodoPagamento, parcelamento;
+    bool repeticao=true;
+    setlocale(LC_ALL, "Portuguese");  //Definindo os caracteres como portugues (para pegar os acentos)
+    while (repeticao == true)
+    {
+
+
+        cout<< "BEM VINDO AO SISTEMA DO MERCADINHO OP \n";
+        cout << "NOSSO LEMA É ''GAME OVER? SÓ NO PREÇO'' \n";
+        cout << " \n";
+        cout<< "Digite 1 para ADIÇÃO DE ESTOQUE; \n";
+        cout << "Digite 2 para VENDAS; \n";
+        cout << "Digite 3 para Dúvidas e mais Informações sobre o sistema; \n";
+        cout << "Digite 4 para Sair; \n";
+        cin>>selecaoDeModulo;
+        switch (selecaoDeModulo) //menu inicial
+        {
+            case 1: //opção para adição de estoque/adição de produtos
+            break;
+            case 2: // opção para venda de produtos
+                cout<< "Selecione seu método de pagamento: \n";
+                cout<< " 1 - a vista (5% de desconto em cima do valor da compra) \n";
+                cout<< " 2 - crédito (até 3x sem juros) \n";
+                cout<<" 3 - crédito (até 12x com 10% de juros) \n";
+
+                cin>> metodoPagamento;
+                switch (metodoPagamento) //menu para opção de pagamento
+                {
+                    case 1: //opção para pagamento a vista
+                    break;
+                    case 2://opção para parcelamento em até 3x
+                        cout<< "escolha a quantas vezes você irá parcelar (lembrando que essa opção permite somente até 3x) \n";
+                        cin>>parcelamento;
+                        if (parcelamento>3 || parcelamento<1) //verificação para ver se o numero digitado é valido
+                        {
+                            while (parcelamento>3 || parcelamento<1) //loop para que o usuario digite o valor correto
+                            {
+                                cout<<"Valor invalido, escolha um dos valores disponiveis para essa opção \n";
+                                cin>>parcelamento;
+                            }
+                        }
+                    break;
+                    case 3://opção de parcelamento de 4 a 12x
+                        cout<< "escolha a quantas vezes você irá parcelar (lembrando que essa opção permite somente até 12x) \n";
+                        cin>>parcelamento;
+                        if (parcelamento>12 || parcelamento<4) //verificação para verificar se o numero digitado é valido
+                        {
+                            while (parcelamento>12 || parcelamento<4) //loop para que o usuario digite o valor correto
+                            {
+                                cout<<"Valor invalido, escolha um dos valores disponiveis para essa opção \n";
+                                cin>>parcelamento;
+                            }
+                        }
+                    break;
+                    }
+            break;
+            case 3: //opção de créditos e piadinhas
+                cout<< "Sistema desenvolvido por Vitória Araújo Silveira e Daniel Machado Nascimento \n";
+                cout << "Em caso de dúvidas o suporte não esta disponviel, boa sorte :) \n";
+                cout << "Aqui somos inimigos do Helpdesk *emogi de joia* \n";
+                cout <<" \n";
+                sleep (4);//tempo para o usuario ler antes da tela ser limpa
+                system("cls"); //limpar a tela
+            break;
+            case 4: //opção de sair
+             repeticao = false;
+            break;
+        }
+    }
+        return 0;
+    }
