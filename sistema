@@ -57,40 +57,42 @@ void LerProdutoArquivo(Mercado produtos [], int& tamanho, const string& estoque)
 //função para atualizar ou adicionar itens
 void AtualizarOuAdd (Mercado produtos[], int& tamanho, const string& estoque)
 {
-    int quantidadeProdutos;
-    cout<<"Insira quantos produtos deseja atualizar ou adicionar (digite 0 para cancelar) \n";
-    cin>>quantidadeProdutos;
-
-    if (quantidadeProdutos == 0)
-    {
-        cout<< "Operação cancelada \n";
-        return;
-    }
-
-    if (quantidadeProdutos <= 0 || quantidadeProdutos > (MAX_PRODUTOS - tamanho))
-    {
-        cout<<"Valor inserido invalido ou excedeu o plano, entre em contato com o suporte \n";
-        return;
-    }
+    string pesquisaUsuario; //string para add ou atualizar
+    cout<<"Digite o nome do produto que deseja Adicionar ou Atualizar (ou digite 'cancelar' para sair) (cuidado com os espaços) \n";
     cin.ignore();
+    getline(cin, pesquisaUsuario); //para pegar a frase inteira ex: Takis Hiper Mega Ultra Picante
 
-    for(int i=0;i<quantidadeProdutos;i++) //atualizar // [i] para itens no carrinho de compra
+    if (pesquisaUsuario=="cancelar") //verificar se o usuario quer sair
     {
-        string pesquisaUsuario;
-        bool existe = false;
-        cout<<"Digite o nome do produto n." << i+1<< "\n";
-        getline(cin, pesquisaUsuario); // pega o nome completo
+        cout<<"Operação cancelada! \n";
+        return; //retorna para o menu
+    }
 
-
-        for(int j=0;j<tamanho;j++) // [j] produtos disponiveis no mercado
+    bool existe = false; //verificar se vai ser uma atualização de produto ou adição
+    for (int j=0; j<tamanho;j++)//para verificar nos produtos ja em "estoque"
+    {
+        if(pesquisaUsuario==produtos[j].nomeDoProduto) //verificar o valor digitado pelo usuario com os ja salvos
         {
-            if (pesquisaUsuario == produtos[j].nomeDoProduto)
+            existe = true; //altera pois o valor foi encontrado
+            cout<<"Esse produto ja existe em nossa base! Deseja atualiza-lo? (S/N) \n";
+            string resposta; //para verificar a resposta
+            cin>>resposta;
+
+            if (resposta != "S" && resposta != "s")
             {
-                existe = true;
-                cout<<"Esse produto ja existe, insira as atualizações \n";
-                cout <<"Novo nome do produto: \n";
-                getline(cin, produtos[j].nomeDoProduto);
-                cout<<"Insira a nova quantidade, somando com a anterior \n";
+                cout<<"Operação cancelada \n";
+                return;
+            }
+            cin.ignore(); //limpar o valor pelo enter
+
+            cout<<"Digite o novo nome do produto, caso queira manter o mesmo digite 'X'(cuidado com os espaços) \n";
+            string attNome;
+            getline(cin,attNome);
+            if(attNome != "x" && attNome != "X") //verificação para manter o mesmo nome
+            {
+                produtos[j].nomeDoProduto=attNome;
+            }
+            cout<<"Insira a nova quantidade, somando com a anterior (atual: " << produtos[j].quantidade <<") \n";
                 cin>>produtos[j].quantidade;
 
                 if (produtos[j].quantidade==0)
@@ -106,7 +108,7 @@ void AtualizarOuAdd (Mercado produtos[], int& tamanho, const string& estoque)
                         cin>>produtos[j].quantidade;
                     }
                 }
-                cout<<"Insira o novo valor para o produto \n";
+                cout<<"Insira o novo valor para o produto (atual: R$ " << produtos[j].valorDeVenda << ")\n";
                 cin>>produtos[j].valorDeVenda;
                 if (produtos[j].valorDeVenda==0)
                     {
@@ -120,68 +122,68 @@ void AtualizarOuAdd (Mercado produtos[], int& tamanho, const string& estoque)
                         cin>>produtos[j].valorDeVenda;
                     }
                 }
+                EscreverProdutosArquivo(produtos, tamanho, estoque);
+                cout << "Dados atualizados com sucesso.\n";
+                return;
+        }
+    }
+
+    if (!existe) //verificação para adicionar
+    {
+        if(tamanho < MAX_PRODUTOS) //verificação para ver se o tamanho limite não foi atingido
+        {
+            cout<<"Produto não encontrado! Deseja cadastra-lo? (s/n) \n";
+            string addProduto;
+            cin>>addProduto;
+
+            if(addProduto == "S" || addProduto == "s") //verificação para prosseguir com o cadastro
+            {
                 cin.ignore();
 
-                //salvar as alterações no arquivo
-                EscreverProdutosArquivo(produtos,tamanho,estoque);
-                cout<<"Dados atualizados com sucesso \n";
-                return;
-            }
-        }
-        if(!existe) //Caso o produto não esteja cadastrado
-        {
-            if (tamanho< MAX_PRODUTOS)
-            {   string cadastro;
-                cout<<"Esse produto não se encontra cadastrado, deseja cadastrá-lo? Digite 's' ou 'S' para continuar \n";
-                cin>>cadastro;
-                if (cadastro != "s" && cadastro != "S")
-                {
-                    return;
-                }
-                produtos[tamanho].nomeDoProduto= pesquisaUsuario;
+                produtos[tamanho].nomeDoProduto = pesquisaUsuario;
                 cout<<"A seguir digite a quantidade: \n";
                 cin>>produtos[tamanho].quantidade;
-                if (produtos[tamanho].quantidade == 0)
+
+                if (produtos[tamanho].quantidade<0) //verificação para que a quantidade não fique negativa
                 {
-                    cout<< "Cadastro cancelado \n";
-                    return;
-                }
-                if (produtos[tamanho].quantidade<0)
-                {
-                    while(produtos[tamanho].quantidade<0)
+                    while(produtos[tamanho].quantidade<0) //loop até que um valor valido seja digitado
                     {
-                        cout<<"O valor digitado foi invalido, digite novamente \n";
+                        cout<<"A quantidade digitada foi invalido, digite novamente \n";
                         cin>>produtos[tamanho].quantidade;
                     }
                 }
+
                 cout<< "Por gentileza escolha o preço do produto: \n";
                 cin>>produtos[tamanho].valorDeVenda;
                 if (produtos[tamanho].valorDeVenda==0)
                     {
                         cout<< "brinde cadastrado \n";
                     }
-                 if (produtos[tamanho].valorDeVenda<0)
+                 if (produtos[tamanho].valorDeVenda<0) //verificação para que o valor de venda não fique negativo
                 {
-                    while(produtos[tamanho].valorDeVenda<0)
+                    while(produtos[tamanho].valorDeVenda<0) //loop ate que o valor seja valido
                     {
                         cout<<"O valor digitado foi invalido, digite novamente \n";
                         cin>>produtos[tamanho].valorDeVenda;
                     }
                 }
-
-              cin.ignore();
-              tamanho ++;
-              //salvar os cadastros no arquivo
-                EscreverProdutosArquivo(produtos,tamanho,estoque);
-                cout<<"Produtos cadastrados com sucesso \n";
-                break;
+                tamanho++;
+                EscreverProdutosArquivo(produtos, tamanho, estoque);
+                cout << "Produto cadastrado com sucesso.\n";
             }
             else
             {
-                cout<<"Limite de produtos alcançado \n";
+                 cout << "Cadastro cancelado.\n";
+                 return;
             }
         }
+        else
+        {
+            cout << "Limite de produtos alcançado.\n";
+            return;
+        }
     }
+
 }
 
 //Mostrar os produtos que tem dentro do carrinho
@@ -198,7 +200,7 @@ void ItensCarrinho (string nomeProdutosCarrinho[], float produtosQuantidade[], i
 void RemoverProdutosCarrinho (string nomeProdutosCarrinho[], float produtosQuantidade[], int& qtddItensCarrinho)
 {
     string removerIten;
-    cout<<"Digite o nome do produto que você deseja retirar \n";
+    cout<<"Digite o nome do produto que você deseja retirar (cuidado com os espaços no fim da frase) \n";
     cin.ignore();
     getline(cin,removerIten);
 
@@ -224,6 +226,7 @@ void RemoverProdutosCarrinho (string nomeProdutosCarrinho[], float produtosQuant
         cout<<"Este produto não esta no carrinho \n";
     }
 }
+
 //função para somar as vendas
 void CarrinhoDoMercadinho(Mercado produtos[], int& tamanho, const string& estoque)
 {
@@ -401,7 +404,7 @@ void menu (Mercado produtos[], int& tamanho, const string& estoque)
             break;
             case 5:
                 cout<< "Até a próxima! \n";
-                
+
             break;
             default:
                 cout<< "Opção invalida tente novamente \n";
@@ -422,3 +425,4 @@ int main()
     menu(produtos,tamanho,estoque); //puxar o menu
     return 0;
 }
+
